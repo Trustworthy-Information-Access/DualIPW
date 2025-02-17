@@ -1,7 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser(description='Pipeline commandline argument')
-parser.add_argument("--n_gpus", type=int, default=2,
+parser.add_argument("--n_gpus", type=int, default=1,
                     help='The number of GPUs.')
 parser.add_argument("--lr", type=float, default=2e-6,
                     help='The max learning rate for pre-training, and the learning rate for finetune.')
@@ -27,10 +27,11 @@ parser.add_argument("--seed", type=int, default=0, help="seed")
 parser.add_argument("--click_mode", type=str, default='multi',
                     help="way to generate train data with multi or single click")
 
-parser.add_argument('--click_pos',type=int,default=-1)
+parser.add_argument('--click_pos', type=int, default=-1)
 parser.add_argument('--eval_type', type=str, default='validQsplit',
                     help='validQsplit devQsplit total_validQsplit')
-parser.add_argument('--click_num',type=str,default='total',help='train data selection: total single multi')
+parser.add_argument('--click_num', type=str, default='total',
+                    help='train data selection: total single multi')
 parser.add_argument("--buffer_size", type=int, default=200000,
                     help='The size of training buffer. Depends on your memory size.')
 parser.add_argument("--log_interval", type=int, default=10,
@@ -52,8 +53,8 @@ parser.add_argument('--iter', type=int, default=0,
 
 parser.add_argument("--method_name", type=str, default="",
                     help='The name of baseline. candidates: [IPWrank, DLA, RegressionEM, PairDebias, NavieAlgorithm]')
-parser.add_argument('--ipw',type=int,default=0)
-parser.add_argument('--limit',type=int,default=10)
+parser.add_argument('--ipw', type=int, default=0)
+parser.add_argument('--limit', type=int, default=10)
 parser.add_argument("--ranking_method", type=str, default="DNN",
                     help='The name of ranking_model. candidates: [DNN,...]')
 
@@ -66,7 +67,7 @@ parser.add_argument("--rank_feature_size", type=int,
                     default=64, help='The number of features used in ltr')
 
 # for propensity_model in iobm
-parser.add_argument('--s_nhidden',type=int,default=16)
+parser.add_argument('--s_nhidden', type=int, default=16)
 parser.add_argument('--s_nlayers', type=int, default=1)
 parser.add_argument('--click_dim', type=int, default=16)
 parser.add_argument('--p_model', type=str, default='DenoisingNet')
@@ -74,18 +75,30 @@ parser.add_argument('--bi', type=int, default=1,
                     help='whether to model bi-direction')
 
 # for qldenoise
-parser.add_argument('--f_mode',type=str,default='kl')
-parser.add_argument('--s1_nlayers',type=int,default=1)
-parser.add_argument('--s1_hidden',type=int,default=8)
+parser.add_argument('--f_mode', type=str, default='kl')
+parser.add_argument('--s1_nlayers', type=int, default=1)
+parser.add_argument('--s1_hidden', type=int, default=8)
 
 parser.add_argument('--loss_mode', type=str, default='listwise')
 
-parser.add_argument('--eta',type=float,default=0)
+parser.add_argument('--eta', type=float, default=0)
+
+# for policy estimation
+parser.add_argument('--data_file', type=str,
+                    default='./ntcir_data/train.initial_scores')
+parser.add_argument('--n_trees', type=int, default=500)
+parser.add_argument('--n_leaves', type=int, default=10)
+parser.add_argument('--lgb_lr', type=float, default=0.01)
+parser.add_argument('--test_only', type=int, default=0,
+                    help='for lgb validation on valid click')
+parser.add_argument('--gen_only', type=int, default=0,
+                    help='for initial_score generation')
+
 
 config = parser.parse_args()
 
 config.train_batch_size = config.n_gpus * config.n_queries_for_each_gpu * \
-        config.num_candidates
+    config.num_candidates
 config.exp_settings = {
     'method_name': config.method_name,
     'n_gpus': config.n_gpus,
